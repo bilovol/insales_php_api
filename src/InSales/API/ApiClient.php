@@ -2,9 +2,47 @@
 
 namespace InSales\API;
 
-use InSales\API\Traits\{
-    Account, Article, ApplicationCharge, ApplicationWidget, Blog, Category, Client, ClientGroup, Collect, Collection, CollectionFieldValue, CollectionFilter, CustomStatus, DeliveryVariant, DiscountCode, Domain, Field, File, Image, InvitedAccount, JsTags, OptionName, OptionValue, Order, Product, ProductField, ProductFieldValue, Property, PaymentGateway, PropertyCharacteristic, Review, Similar, StockCurrency, Supplementary, Testing, Variant, VariantField, VariantFieldValue, WebHook, PaymentNotify
-};
+use InSales\API\Traits\{Account,
+    Article,
+    ApplicationCharge,
+    RecurringApplicationCharge,
+    ApplicationWidget,
+    Blog,
+    Category,
+    Client,
+    ClientGroup,
+    Collect,
+    Collection,
+    CollectionFieldValue,
+    CollectionFilter,
+    CustomStatus,
+    DeliveryVariant,
+    DiscountCode,
+    Domain,
+    Field,
+    File,
+    Image,
+    InvitedAccount,
+    JsTags,
+    OptionName,
+    OptionValue,
+    Order,
+    Product,
+    ProductField,
+    ProductFieldValue,
+    Property,
+    PaymentGateway,
+    PropertyCharacteristic,
+    Review,
+    Similar,
+    StockCurrency,
+    Supplementary,
+    Testing,
+    Variant,
+    VariantField,
+    VariantFieldValue,
+    WebHook,
+    PaymentNotify};
 use InSales\Http\Client as HttpClient;
 
 /**
@@ -14,7 +52,7 @@ use InSales\Http\Client as HttpClient;
 class ApiClient
 {
     use
-        Account, Article, Order, ApplicationCharge, ApplicationWidget,
+        Account, Article, Order, ApplicationCharge, RecurringApplicationCharge, ApplicationWidget,
         Blog,
         Category, Client, ClientGroup, Collection, Collect, CollectionFieldValue, CollectionFilter, CustomStatus,
         DeliveryVariant, DiscountCode, Domain,
@@ -32,6 +70,7 @@ class ApiClient
 
     const API_URL_ACCOUNT = '/admin/account';
     const API_URL_APPLICATION_CHARGES = '/admin/application_charges';
+    const API_URL_RECURRING_APPLICATION_CHARGE = '/admin/recurring_application_charge';
     const API_URL_APPLICATION_WIDGET = '/admin/application_widgets';
     const API_URL_ARTICLE = '/admin/blogs/{slug}/articles';
     const API_URL_BLOGS = '/admin/blogs';

@@ -16,6 +16,7 @@ class Client
     const METHOD_GET = 'GET';
     const METHOD_PUT = 'PUT';
     const METHOD_DELETE = 'DELETE';
+    const METHOD_PATCH = 'PATCH';
 
     private $baseUrl;
     private $hostName;
@@ -38,7 +39,7 @@ class Client
     /**
      * @return string
      */
-    public function getBaseUrl() : string
+    public function getBaseUrl(): string
     {
         return $this->baseUrl;
     }
@@ -46,7 +47,7 @@ class Client
     /**
      * @return string
      */
-    public function getHostName() : string
+    public function getHostName(): string
     {
         return $this->hostName;
     }
@@ -61,7 +62,7 @@ class Client
      *
      * @return ApiResponse
      */
-    public function request(string $method, string $url, string $params = '', array $headers = []) : ApiResponse
+    public function request(string $method, string $url, string $params = '', array $headers = []): ApiResponse
     {
         $responseHeaders = [];
         $ch = curl_init();
@@ -76,6 +77,7 @@ class Client
             || self::METHOD_PUT === $method
             || self::METHOD_DELETE === $method
             || self::METHOD_GET === $method
+            || self::METHOD_PATCH === $method
         ) {
             if (empty($headers)) {
                 $headers[] = 'Content-Type: application/json';
@@ -97,12 +99,15 @@ class Client
         if (self::METHOD_DELETE === $method) {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
         }
+        if (self::METHOD_PATCH === $method) {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        }
         curl_setopt(
             $ch,
             CURLOPT_HEADERFUNCTION,
-            function($ch, $header) use (&$responseHeaders) {
+            function ($ch, $header) use (&$responseHeaders) {
                 unset($ch);
-                if (substr_count($header, ':')){
+                if (substr_count($header, ':')) {
                     list($key, $value) = explode(':', $header, 2);
                     $responseHeaders[$key] = trim($value);
                 } else {
@@ -138,7 +143,7 @@ class Client
      * @param array $data
      * @return ApiResponse
      */
-    public function executeCreateRequest(string $url, array $data) : ApiResponse
+    public function executeCreateRequest(string $url, array $data): ApiResponse
     {
 
         $response = $this->request(
@@ -164,7 +169,7 @@ class Client
      * @param $id
      * @return ApiResponse
      */
-    public function executeRemoveRequest(string $url, $id) : ApiResponse
+    public function executeRemoveRequest(string $url, $id): ApiResponse
     {
         $response = $this->request(
             self::METHOD_DELETE,
@@ -177,12 +182,34 @@ class Client
     }
 
     /**
+     * Выполнение запроса на patch сущности
+     * @param string $url
+     * @param $id
+     * @return ApiResponse
+     */
+    public function executePatchRequest(string $url, $id): ApiResponse
+    {
+        $response = $this->request(
+            self::METHOD_PATCH,
+            $url
+        );
+        if ($response->getHttpCode() != 200) {
+            $errorMessage = $response->getData();
+            if (is_array($errorMessage)) {
+                $errorMessage = current($errorMessage);
+                $response->setMessage($errorMessage);
+            }
+        }
+        return $response;
+    }
+
+    /**
      * Выполнение запроса на получение списка сущностей
      * @param string $url
      * @param array $params
      * @return ApiResponse
      */
-    public function executeListRequest(string $url, array $params = []) : ApiResponse
+    public function executeListRequest(string $url, array $params = []): ApiResponse
     {
         $response = $this->request(
             self::METHOD_GET,
@@ -192,7 +219,7 @@ class Client
 
         if ($response->getHttpCode() != 200) {
             $errorMessage = $response->getData();
-            if (is_array($errorMessage)){
+            if (is_array($errorMessage)) {
                 $errorMessage = current($errorMessage);
                 $response->setMessage($errorMessage);
             }
@@ -207,14 +234,14 @@ class Client
      * @param array $params
      * @return ApiResponse
      */
-    public function executeGetRequest(string $url, $id, array $params = []) : ApiResponse
+    public function executeGetRequest(string $url, $id, array $params = []): ApiResponse
     {
         $response = $this->request(
             self::METHOD_GET,
             $url,
             http_build_query($params)
         );
-        if(!$response->getData()) {
+        if (!$response->getData()) {
             $response->setHttpCode(404);
             $response->setMessage("Запись '$id' не найдена.'");
         }
@@ -228,7 +255,7 @@ class Client
      * @param array $data
      * @return ApiResponse
      */
-    public function executeUpdateRequest(string $url, array $data) : ApiResponse
+    public function executeUpdateRequest(string $url, array $data): ApiResponse
     {
         $response = $this->request(
             self::METHOD_PUT,
@@ -237,7 +264,7 @@ class Client
         );
         if ($response->getHttpCode() != 200) {
             $errorMessage = $response->getData();
-            if (is_array($errorMessage)){
+            if (is_array($errorMessage)) {
                 $errorMessage = current($errorMessage);
                 $response->setMessage($errorMessage);
             }
